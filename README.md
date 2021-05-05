@@ -1,4 +1,4 @@
-Airplane seating algorithm:
+**Airplane seating algorithm:**
 
 I have created a REST end point using Spring Boot Framework which will accept two inputs
 
@@ -16,9 +16,9 @@ A - Aisle
 W - Window
 C - Center
 
-This Rest Service is consumed using POSTMAN, Kindly refer "RestInputOutput.PNG" image for viewing input and output format of this rest service.
+This Rest Service is consumed using POSTMAN, Kindly refer **"RestInputOutput.PNG"** image for viewing input and output format of this rest service.
 
-The logic are written in AirplaneSeatingController.java
-The tests are performed in AirplaneSeatingApplicationTests.java
+The logic are written in **AirplaneSeatingController.java**
+The tests are performed in **AirplaneSeatingApplicationTests.java**
 Postman request template is available in Airplane Seating.postman_collection.json
 
