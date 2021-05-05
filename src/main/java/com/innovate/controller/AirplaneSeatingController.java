@@ -14,14 +14,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.innovate.entity.AirplaneEntity;
 
+/**
+ * AirplaneSeatingController is used to handle airplane seating functions
+ *  
+ * @author Vasanthan C
+ */
 @RestController
-@RequestMapping("/airaplane")
+@RequestMapping("/airplane")
 public class AirplaneSeatingController {
 	
+	/** The Constant ROW_INDEX represents index where number of rows is stored in blueprint*/
+	private static final int ROW_INDEX = 1;
+	/** The Constant COLUMN_INDEX represents index where number of columns is stored  in blueprint*/
+	private static final int COLUMN_INDEX = 0;	
+	/** The Constant INVALID_SEAT represents invalid seat in result array */
+	private static final int INVALID_SEAT = 0;
 	
-	private static final int rowIndex = 1;
-	private static final int columnIndex = 0;		
-	
+	/**
+	 * calculateSeatingPosition method calculates seating position for numberOfPassengers given in input in given blueprint 
+	 * @param inputArray which defines the airplane seating blueprint
+	 * @param numberOfPassengers is the number of passengers for whom seating need to be calculated
+	 * @return resultMap
+	 */
 	@GetMapping("/calculateSeatingPosition")  
 	public Map<String,Object> calculateSeatingPosition(@RequestBody int[][] inputArray,@RequestBody int numberOfPassengers) {
 
@@ -49,6 +63,14 @@ public class AirplaneSeatingController {
 		return resultMap;
 	}
 	
+	/**
+	 * determineSeatCategory method categories the seats into Aisle,Window and Center
+	 * @param inputArray which defines the airplane seating blueprint
+	 * @param aisleColumns column numbers which come into Aisle category
+	 * @param windowColumns column numbers which come into Window category
+	 * @param centreColumns column numbers which come into Center category
+	 * @return AirplaneEntity
+	 */
 	private AirplaneEntity determineSeatCategory(int[][] inputArray,
 			List<Integer> aisleColumns,List<Integer> windowColumns,List<Integer> centreColumns) {
 		
@@ -56,8 +78,8 @@ public class AirplaneSeatingController {
 		int columnSum = 0;
 		
 		for(int segmentIterator = 0; segmentIterator < inputArray.length;segmentIterator++) { 
-			if(inputArray[segmentIterator][rowIndex]> maxRow) maxRow = inputArray[segmentIterator][rowIndex];
-			int columnCount = inputArray[segmentIterator][columnIndex];
+			if(inputArray[segmentIterator][ROW_INDEX]> maxRow) maxRow = inputArray[segmentIterator][ROW_INDEX];
+			int columnCount = inputArray[segmentIterator][COLUMN_INDEX];
 			if(segmentIterator==0)	windowColumns.add(columnSum);
 			if(segmentIterator>0)	aisleColumns.add(columnSum);
 			if(columnCount>2) centreColumns.addAll(IntStream.rangeClosed(columnSum+1, columnSum+columnCount-2).boxed().collect(Collectors.toList()));
@@ -68,6 +90,15 @@ public class AirplaneSeatingController {
 		return new AirplaneEntity(maxRow, columnSum);
 	}
 	
+	/**
+	 * determineSeatCount method calculates seat count of all three categories (Aisle,Window and Center)
+	 * @param inputArray which defines the airplane seating blueprint
+	 * @param resultArray which defines seating position of each passenger
+	 * @param aisleColumns column numbers which come into Aisle category
+	 * @param windowColumns column numbers which come into Window category
+	 * @param centreColumns column numbers which come into Center category
+	 * @return AirplaneEntity
+	 */
 	private AirplaneEntity determineSeatCount(int[][] inputArray,int[][] resultArray
 			,List<Integer> aisleColumns,List<Integer> windowColumns,List<Integer> centreColumns) {
 		
@@ -77,24 +108,34 @@ public class AirplaneSeatingController {
 		int validCentreCount=0;
 		
 		for(int segmentIterator = 0; segmentIterator < inputArray.length;segmentIterator++) { 
-			for(int rowiterator=0;rowiterator<inputArray[segmentIterator][rowIndex];rowiterator++) {
-				for(int columnIterator=validColumnIterator;columnIterator<validColumnIterator+inputArray[segmentIterator][columnIndex];columnIterator++) {
+			for(int rowiterator=0;rowiterator<inputArray[segmentIterator][ROW_INDEX];rowiterator++) {
+				for(int columnIterator=validColumnIterator;columnIterator<validColumnIterator+inputArray[segmentIterator][COLUMN_INDEX];columnIterator++) {
 					resultArray[rowiterator][columnIterator] = Integer.MIN_VALUE;
 					if(aisleColumns.contains(columnIterator)) validAisleCount++;
 					if(windowColumns.contains(columnIterator)) validWindowCount++;
 					if(centreColumns.contains(columnIterator)) validCentreCount++;
 				}
 			}
-			validColumnIterator+=inputArray[segmentIterator][columnIndex];
+			validColumnIterator+=inputArray[segmentIterator][COLUMN_INDEX];
 		}
 		
 		return new AirplaneEntity(validColumnIterator, validAisleCount, validWindowCount, validCentreCount);
 	}
 	
+	/**
+	 * fillPassengers method fills the passengers based on the following conditions
+	 * Top to Bottom,left to right, isle
+	 * @param resultArray
+	 * @param aisleColumns
+	 * @param windowColumns
+	 * @param centreColumns
+	 * @param airplaneEntity
+	 * @param numberOfPassengers
+	 * @return
+	 */
 	private Map<String,Object> fillPassengers(int[][] resultArray,List<Integer> aisleColumns,List<Integer> windowColumns
 			,List<Integer> centreColumns, AirplaneEntity airplaneEntity, int numberOfPassengers) {
 		
-		int validColumnIterator=airplaneEntity.getValidColumnIterator();
 		int validAisleCount=airplaneEntity.getValidAisleCount();
 		int validWindowCount=airplaneEntity.getValidWindowCount();
 		int validCentreCount=airplaneEntity.getValidCentreCount();
@@ -109,28 +150,28 @@ public class AirplaneSeatingController {
 		
 		while(passengersFilled < numberOfPassengers) {
 			
-			if(resultArray[rowiterator][columnIterator] == 0) {
-		    }else if(aisleFilledCount<(validAisleCount)) {
-				if(aisleColumns.contains(columnIterator)) {
+			if(resultArray[rowiterator][columnIterator] == INVALID_SEAT) {
+		    }else if(aisleFilledCount<validAisleCount) {  // When Aisle seats are available to fill
+				if(aisleColumns.contains(columnIterator)) { // When current column is valid Aisle Column
 					resultArray[rowiterator][columnIterator] = ++passengersFilled;
 					aisleFilledCount++;
-					if(aisleFilledCount==(validAisleCount)) {
+					if(aisleFilledCount==validAisleCount) {
 						rowiterator = 0;columnIterator = -1;
 					}
 				} 
-			}else if(windowFilledCount<(validWindowCount)) {
-						if(windowColumns.contains(columnIterator)) {
+			}else if(windowFilledCount<validWindowCount) { // When Window seats are available to fill
+						if(windowColumns.contains(columnIterator)) { // When current column is valid Window Column
 							resultArray[rowiterator][columnIterator] = ++passengersFilled;
 							windowFilledCount++;
-							if(windowFilledCount==(validWindowCount)) {
+							if(windowFilledCount==validWindowCount) {
 								rowiterator = 0;columnIterator = -1;
 							}
 						} 
-			}else if(centreFilledCount<(validCentreCount)) {
-				if(centreColumns.contains(columnIterator)) {
+			}else if(centreFilledCount<validCentreCount) { // When Center seats are available to fill
+				if(centreColumns.contains(columnIterator)) { // When current column is valid Center Column
 					resultArray[rowiterator][columnIterator] = ++passengersFilled;
 					centreFilledCount++;
-					if(centreFilledCount==(validCentreCount)) {
+					if(centreFilledCount==validCentreCount) {
 						rowiterator = 0;columnIterator = -1;
 					}
 				} 
@@ -143,9 +184,35 @@ public class AirplaneSeatingController {
 			rowiterator%= maxRow; 
 		}
 		
-		resultMap.put("resultArray", resultArray);
 		resultMap.put("status", Boolean.TRUE);
+		resultMap.put("resultArray", resultArray);
+		resultMap.put("prettyResult", printBlueprintAfterFilling(resultArray, aisleColumns, windowColumns, centreColumns));
 		return resultMap;
+	}
+
+	/**printBlueprintAfterFilling 
+	 * @param resultArray
+	 * @return
+	 */
+	private String printBlueprintAfterFilling(int[][] resultArray,List<Integer> aisleColumns,List<Integer> windowColumns
+			,List<Integer> centreColumns) {
+		String resultString = "";
+		String seatCategory = "";
+		for(int rowiterator=0;rowiterator<resultArray.length;rowiterator++) {
+			for(int columnIterator=0;columnIterator<resultArray[rowiterator].length;columnIterator++) {
+				if(aisleColumns.contains(columnIterator)) seatCategory="A";
+				else if(windowColumns.contains(columnIterator)) seatCategory="W";
+				else if(centreColumns.contains(columnIterator)) seatCategory="C";
+				if(resultArray[rowiterator][columnIterator] ==0)
+					resultString+="  \t";
+				else if(resultArray[rowiterator][columnIterator]==Integer.MIN_VALUE)
+					resultString+=seatCategory+0+"\t";
+				else
+					resultString+=seatCategory+resultArray[rowiterator][columnIterator]+"\t";
+			} 
+			resultString+=" \n";
+		}
+		return resultString;
 	}
 
 }
