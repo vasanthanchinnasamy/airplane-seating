@@ -38,6 +38,12 @@ public class AirplaneSeatingController {
 		AirplaneEntity seatCountEntity = determineSeatCount(inputArray, resultArray, aisleColumns, windowColumns, centreColumns);
 		seatCountEntity = seatCountEntity.copyRowColumn(airplaneEntity);
 		
+		if(numberOfPassengers>seatCountEntity.getAllSeatCount()) {
+			resultMap.put("message", "Passenger count is greater than available seats.");
+			resultMap.put("status", Boolean.FALSE);
+			return resultMap;
+		}
+		
 		resultMap= fillPassengers(resultArray, aisleColumns, windowColumns, centreColumns,seatCountEntity,numberOfPassengers);
 		
 		return resultMap;

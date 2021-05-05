@@ -5,6 +5,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.Assert;
 
 import com.innovate.controller.AirplaneSeatingController;
 
@@ -15,8 +16,18 @@ class AirplaneSeatingApplicationTests {
 	@Autowired
 	private AirplaneSeatingController   airplaneSeatingController;
 
+ 	
+	
 	@Test
-	void contextLoads() {
+	void testOverflowCondition() {
+		
+		int[][] inputArray = {
+				{3,2},
+				{4,3},
+				{2,3},
+				{3,4}};
+		Map<String,Object> resultMap = airplaneSeatingController.calculateSeatingPosition(inputArray, 40);
+		Assert.isTrue(!(Boolean) resultMap.get("status"), "Passenger count is greater than available seats.");
 	}
 	
 	@Test
