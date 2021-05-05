@@ -40,54 +40,6 @@ public class AirplaneSeatingController {
 		
 		resultMap= fillPassengers(resultArray, aisleColumns, windowColumns, centreColumns,seatCountEntity,numberOfPassengers);
 		
-//		int validColumnIterator=seatCountEntity.getValidColumnIterator();
-//		int validAisleCount=seatCountEntity.getValidAisleCount();
-//		int validWindowCount=seatCountEntity.getValidWindowCount();
-//		int validCentreCount=seatCountEntity.getValidCentreCount();
-		
-//		int passengersFilled = 0;
-//		int aisleFilledCount = 0;
-//		int windowFilledCount = 0;
-//		int centreFilledCount = 0;
-//		int rowiterator = 0;
-//		int columnIterator = 0;
-//		
-//		while(passengersFilled < numberOfPassengers) {
-//			
-//			if(resultArray[rowiterator][columnIterator] == 0) {
-//		    }else if(aisleFilledCount<(validAisleCount)) {
-//				if(aisleColumns.contains(columnIterator)) {
-//					resultArray[rowiterator][columnIterator] = ++passengersFilled;
-//					aisleFilledCount++;
-//					if(aisleFilledCount==(validAisleCount)) {
-//						rowiterator = 0;columnIterator = -1;
-//					}
-//				} 
-//			}else if(windowFilledCount<(validWindowCount)) {
-//						if(windowColumns.contains(columnIterator)) {
-//							resultArray[rowiterator][columnIterator] = ++passengersFilled;
-//							windowFilledCount++;
-//							if(windowFilledCount==(validWindowCount)) {
-//								rowiterator = 0;columnIterator = -1;
-//							}
-//						} 
-//			}else if(centreFilledCount<(validCentreCount)) {
-//				if(centreColumns.contains(columnIterator)) {
-//					resultArray[rowiterator][columnIterator] = ++passengersFilled;
-//					centreFilledCount++;
-//					if(centreFilledCount==(validCentreCount)) {
-//						rowiterator = 0;columnIterator = -1;
-//					}
-//				} 
-//			}
-//			
-//			columnIterator++;
-//			int columnRemaining = columnIterator / columnSum;
-//			columnIterator %= columnSum;
-//			rowiterator+= columnRemaining;
-//			rowiterator%= maxRow; 
-//		}
-		
 		return resultMap;
 	}
 	
