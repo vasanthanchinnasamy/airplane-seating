@@ -1,0 +1,53 @@
+{
+	"info": {
+		"_postman_id": "9d837e43-9fd4-4ebe-bc2c-5c734456918a",
+		"name": "Airplane Seating POSTMAN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/airplane/calculateSeatingPosition",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"inputArray\":[[3,2],[4,3],[2,3],[3,4]],\r\n    \"numberOfPassengers\" : 30\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/airplane/calculateSeatingPosition",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"airplane",
+						"calculateSeatingPosition"
+					],
+					"query": [
+						{
+							"key": "numberOfPassengers",
+							"value": "30",
+							"disabled": true
+						},
+						{
+							"key": "inputArray[0][0]",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

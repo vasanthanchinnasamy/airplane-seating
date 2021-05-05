@@ -1,5 +1,6 @@
 package com.innovate.controller;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -221,9 +222,9 @@ public class AirplaneSeatingController {
 				if(resultArray[rowiterator][columnIterator] ==0)
 					resultString+="       ";
 				else if(resultArray[rowiterator][columnIterator]==Integer.MIN_VALUE)
-					resultString+=seatCategory+0+"    ";
+					resultString+=seatCategory+new DecimalFormat("00").format(0)+"    ";
 				else
-					resultString+=seatCategory+resultArray[rowiterator][columnIterator]+"    ";
+					resultString+=seatCategory+new DecimalFormat("00").format(resultArray[rowiterator][columnIterator])+"    ";
 			} 
 			resultStringList.add(resultString);
 			resultString="";
