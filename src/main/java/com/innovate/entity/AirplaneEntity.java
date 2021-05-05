@@ -70,9 +70,5 @@ public class AirplaneEntity {
 	public int getAllSeatCount() {
 		return this.validAisleCount+this.validWindowCount+this.validCentreCount;
 	}
-	
-	
-	
-	
 
 }

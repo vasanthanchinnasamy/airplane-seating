@@ -2,10 +2,13 @@ package com.innovate.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,12 +35,17 @@ public class AirplaneSeatingController {
 	
 	/**
 	 * calculateSeatingPosition method calculates seating position for numberOfPassengers given in input in given blueprint 
-	 * @param inputArray which defines the airplane seating blueprint
-	 * @param numberOfPassengers is the number of passengers for whom seating need to be calculated
+	 * @param inputData contains inputArray and numberOfPassengers
+	 * inputArray defines the airplane seating blueprint
+	 * numberOfPassengers is the number of passengers for whom seating need to be calculated
 	 * @return resultMap
 	 */
 	@GetMapping("/calculateSeatingPosition")  
-	public Map<String,Object> calculateSeatingPosition(@RequestBody int[][] inputArray,@RequestBody int numberOfPassengers) {
+	public Map<String,Object> calculateSeatingPosition(@RequestBody Map<String,Object> inputData) {
+		
+		JSONObject jsonObject = new JSONObject(inputData);
+		int numberOfPassengers = jsonObject.getInt("numberOfPassengers");
+		int [][] inputArray = parseArray(jsonObject.getJSONArray("inputArray"));
 
 		List<Integer> aisleColumns = new ArrayList<>();
 		List<Integer> windowColumns = new ArrayList<>();
@@ -63,6 +71,8 @@ public class AirplaneSeatingController {
 		return resultMap;
 	}
 	
+
+
 	/**
 	 * determineSeatCategory method categories the seats into Aisle,Window and Center
 	 * @param inputArray which defines the airplane seating blueprint
@@ -185,34 +195,58 @@ public class AirplaneSeatingController {
 		}
 		
 		resultMap.put("status", Boolean.TRUE);
-		resultMap.put("resultArray", resultArray);
-		resultMap.put("prettyResult", printBlueprintAfterFilling(resultArray, aisleColumns, windowColumns, centreColumns));
+		resultMap.put("prettyResult", prettyPrintResult(resultArray, aisleColumns, windowColumns, centreColumns));
 		return resultMap;
 	}
 
-	/**printBlueprintAfterFilling 
+	
+	/**
+	 * prettyPrintResult converts the result array into pretty json string  
 	 * @param resultArray
 	 * @return
 	 */
-	private String printBlueprintAfterFilling(int[][] resultArray,List<Integer> aisleColumns,List<Integer> windowColumns
+	private List<String> prettyPrintResult(int[][] resultArray,List<Integer> aisleColumns,List<Integer> windowColumns
 			,List<Integer> centreColumns) {
 		String resultString = "";
 		String seatCategory = "";
+		List<String> resultStringList = new LinkedList<>();
+		
 		for(int rowiterator=0;rowiterator<resultArray.length;rowiterator++) {
 			for(int columnIterator=0;columnIterator<resultArray[rowiterator].length;columnIterator++) {
+				
 				if(aisleColumns.contains(columnIterator)) seatCategory="A";
 				else if(windowColumns.contains(columnIterator)) seatCategory="W";
 				else if(centreColumns.contains(columnIterator)) seatCategory="C";
+				
 				if(resultArray[rowiterator][columnIterator] ==0)
-					resultString+="  \t";
+					resultString+="       ";
 				else if(resultArray[rowiterator][columnIterator]==Integer.MIN_VALUE)
-					resultString+=seatCategory+0+"\t";
+					resultString+=seatCategory+0+"    ";
 				else
-					resultString+=seatCategory+resultArray[rowiterator][columnIterator]+"\t";
+					resultString+=seatCategory+resultArray[rowiterator][columnIterator]+"    ";
 			} 
-			resultString+=" \n";
+			resultStringList.add(resultString);
+			resultString="";
 		}
-		return resultString;
+		return resultStringList;
+	}
+	
+	/**
+	 * parseArray parses json array into java 2d array 
+	 * @param jsonArray
+	 * @return
+	 */
+	private int[][] parseArray(JSONArray jsonArray) {
+		int [][] inputArray = new int[jsonArray.length()][2];
+		for(int rowIterator=0;rowIterator<jsonArray.length();rowIterator++) {
+			JSONArray innerJsonArray = jsonArray.getJSONArray(rowIterator);
+			int innerArray[] = new int[innerJsonArray.length()];
+			for(int columnIterator=0;columnIterator<innerJsonArray.length();columnIterator++) {
+				innerArray[columnIterator] = innerJsonArray.getInt(columnIterator);
+			}
+			inputArray[rowIterator] = innerArray;
+		}
+		return inputArray;
 	}
 
 }
