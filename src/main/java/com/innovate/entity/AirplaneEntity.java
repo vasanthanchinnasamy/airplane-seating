@@ -1,4 +1,4 @@
-package com.innovate;
+package com.innovate.entity;
 
 public class AirplaneEntity {
 	
