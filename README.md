@@ -12,8 +12,8 @@ Output returned is a list of string where each entry in the list represent each 
 In each row, data is comma separated where each item represents passenger number along with seat category.
 
 Seat Category:
-A - Aisle
-W - Window
+A - Aisle  
+W - Window  
 C - Center
 
 This Rest Service is consumed using POSTMAN, Kindly refer **"RestInputOutput.PNG"** image for viewing input and output format of this rest service.
