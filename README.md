@@ -9,7 +9,7 @@ Based on the inputs it will perform seating passengers as per rules mentioned in
 
 Output returned is a list of string where each entry in the list represent each row in airplane.
 
-In each row, data is comma separated where each item represents passenger number along with seat category.
+In each row, data is space separated where each item represents passenger number along with seat category.
 
 Seat Category:  
 A - Aisle  
