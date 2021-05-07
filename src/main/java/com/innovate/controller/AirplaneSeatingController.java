@@ -108,7 +108,7 @@ public class AirplaneSeatingController {
 			else if(segmentIterator==lastSegment) windowColumns.add(currentSegmentColumnEndIndex);
 			
 			if(segmentIterator>FIRST_SEGMENT)	aisleColumns.add(currentSegmentColumnStartIndex);
-			if(segmentIterator<lastSegment && currentSegmentColumnCount>ONE_COLUMN) aisleColumns.add(totalColumCount-1);
+			if(segmentIterator<lastSegment && currentSegmentColumnCount>ONE_COLUMN) aisleColumns.add(currentSegmentColumnEndIndex);
 			
 			if(currentSegmentColumnCount>BORDER_COLUMN_COUNT) 
 				centreColumns.addAll(IntStream.rangeClosed(currentSegmentColumnStartIndex+ONE_COLUMN, currentSegmentColumnEndIndex-ONE_COLUMN).boxed().collect(Collectors.toList()));
