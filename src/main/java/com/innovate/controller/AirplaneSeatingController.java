@@ -28,11 +28,17 @@ import com.innovate.entity.AirplaneEntity;
 public class AirplaneSeatingController {
 	
 	/** The Constant ROW_INDEX represents index where number of rows is stored in blueprint*/
-	private static final int ROW_INDEX = 1;
+	private static final int ROW_COUNT_INDEX = 1;
 	/** The Constant COLUMN_INDEX represents index where number of columns is stored  in blueprint*/
-	private static final int COLUMN_INDEX = 0;	
+	private static final int COLUMN_COUNT_INDEX = 0;	
 	/** The Constant INVALID_SEAT represents invalid seat in result array */
 	private static final int INVALID_SEAT = 0;
+	/** The Constant FIRST_SEGMENT represents column index of first segment */
+	private static final int FIRST_SEGMENT = 0;
+	/** The Constant BORDER_COLUMN_COUNT represents number of border(aisle or window) columns a segment always have*/
+	private static final int BORDER_COLUMN_COUNT = 2;
+	/** The Constant ONE_COLUMN represents column count of one column*/
+	private static final int ONE_COLUMN = 1;
 	
 	/**
 	 * calculateSeatingPosition method calculates seating position for numberOfPassengers given in input in given blueprint 
@@ -76,29 +82,38 @@ public class AirplaneSeatingController {
 
 	/**
 	 * determineSeatCategory method categories the seats into Aisle,Window and Center
-	 * @param inputArray which defines the airplane seating blueprint
+	 * @param airplaneSegments which defines row count and column count in each segment of the airplane
 	 * @param aisleColumns column numbers which come into Aisle category
 	 * @param windowColumns column numbers which come into Window category
 	 * @param centreColumns column numbers which come into Center category
 	 * @return AirplaneEntity
 	 */
-	private AirplaneEntity determineSeatCategory(int[][] inputArray,
+	private AirplaneEntity determineSeatCategory(int[][] airplaneSegments,
 			List<Integer> aisleColumns,List<Integer> windowColumns,List<Integer> centreColumns) {
 		
-		int maxRow = Integer.MIN_VALUE;
-		int columnSum = 0;
+		int maximumRowCount = Integer.MIN_VALUE;
+		int totalColumCount = 0;
 		
-		for(int segmentIterator = 0; segmentIterator < inputArray.length;segmentIterator++) { 
-			if(inputArray[segmentIterator][ROW_INDEX]> maxRow) maxRow = inputArray[segmentIterator][ROW_INDEX];
-			int columnCount = inputArray[segmentIterator][COLUMN_INDEX];
-			if(segmentIterator==0)	windowColumns.add(columnSum);
-			if(segmentIterator>0)	aisleColumns.add(columnSum);
-			if(columnCount>2) centreColumns.addAll(IntStream.rangeClosed(columnSum+1, columnSum+columnCount-2).boxed().collect(Collectors.toList()));
-			columnSum += columnCount;
-			if(segmentIterator<inputArray.length-1 && columnCount>1) aisleColumns.add(columnSum-1);
-			if(segmentIterator==inputArray.length-1 && inputArray.length>1) windowColumns.add(columnSum-1);
+		for(int segmentIterator = 0; segmentIterator < airplaneSegments.length;segmentIterator++) {
+			
+			maximumRowCount = Math.max(maximumRowCount, airplaneSegments[segmentIterator][ROW_COUNT_INDEX]);
+			
+			int currentSegmentColumnCount = airplaneSegments[segmentIterator][COLUMN_COUNT_INDEX];
+			int lastSegment = airplaneSegments.length-1;
+			int currentSegmentColumnStartIndex = totalColumCount;
+			totalColumCount += currentSegmentColumnCount;
+			int currentSegmentColumnEndIndex = totalColumCount-1;
+			
+			if(segmentIterator==FIRST_SEGMENT)	windowColumns.add(FIRST_SEGMENT);
+			else if(segmentIterator==lastSegment) windowColumns.add(currentSegmentColumnEndIndex);
+			
+			if(segmentIterator>FIRST_SEGMENT)	aisleColumns.add(currentSegmentColumnStartIndex);
+			if(segmentIterator<lastSegment && currentSegmentColumnCount>ONE_COLUMN) aisleColumns.add(totalColumCount-1);
+			
+			if(currentSegmentColumnCount>BORDER_COLUMN_COUNT) 
+				centreColumns.addAll(IntStream.rangeClosed(currentSegmentColumnStartIndex+ONE_COLUMN, currentSegmentColumnEndIndex-ONE_COLUMN).boxed().collect(Collectors.toList()));
 		}
-		return new AirplaneEntity(maxRow, columnSum);
+		return new AirplaneEntity(maximumRowCount, totalColumCount);
 	}
 	
 	/**
@@ -119,15 +134,15 @@ public class AirplaneSeatingController {
 		int validCentreCount=0;
 		
 		for(int segmentIterator = 0; segmentIterator < inputArray.length;segmentIterator++) { 
-			for(int rowiterator=0;rowiterator<inputArray[segmentIterator][ROW_INDEX];rowiterator++) {
-				for(int columnIterator=validColumnIterator;columnIterator<validColumnIterator+inputArray[segmentIterator][COLUMN_INDEX];columnIterator++) {
+			for(int rowiterator=0;rowiterator<inputArray[segmentIterator][ROW_COUNT_INDEX];rowiterator++) {
+				for(int columnIterator=validColumnIterator;columnIterator<validColumnIterator+inputArray[segmentIterator][COLUMN_COUNT_INDEX];columnIterator++) {
 					resultArray[rowiterator][columnIterator] = Integer.MIN_VALUE;
 					if(aisleColumns.contains(columnIterator)) validAisleCount++;
 					if(windowColumns.contains(columnIterator)) validWindowCount++;
 					if(centreColumns.contains(columnIterator)) validCentreCount++;
 				}
 			}
-			validColumnIterator+=inputArray[segmentIterator][COLUMN_INDEX];
+			validColumnIterator+=inputArray[segmentIterator][COLUMN_COUNT_INDEX];
 		}
 		
 		return new AirplaneEntity(validColumnIterator, validAisleCount, validWindowCount, validCentreCount);
